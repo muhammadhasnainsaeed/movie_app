@@ -5,11 +5,16 @@ import { images } from "@/constants/images";
 import useFetch from "@/hooks/useFetch";
 import { fetchMovies } from "@/services/api";
 import { updateSearchCount } from "@/services/appwrite";
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
+
+const renderMovieItem = ({ item }: { item: Movie }) => <MovieCard {...item} />;
+const movieKeyExtractor = (item: Movie) => item.id.toString();
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const searchQueryRef = useRef(searchQuery);
+  searchQueryRef.current = searchQuery;
 
   const {
     data: movies = [],
@@ -17,29 +22,30 @@ const Search = () => {
     error,
     refetch: loadMovies,
     reset,
-  } = useFetch(() => fetchMovies({ query: searchQuery }), false);
+  } = useFetch(() => fetchMovies({ query: searchQueryRef.current }), false);
 
-  const handleSearch = (text: string) => {
+  const handleSearch = useCallback((text: string) => {
     setSearchQuery(text);
-  };
+  }, []);
 
   useEffect(() => {
-    const timeOutId = setTimeout(async () => {
+    const timeoutId = setTimeout(() => {
       if (searchQuery.trim()) {
-        await loadMovies();
+        loadMovies();
       } else {
         reset();
       }
     }, 500);
 
-    return () => clearTimeout(timeOutId);
-  }, [searchQuery]);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, loadMovies, reset]);
 
   useEffect(() => {
-    if (movies?.length! > 0 && movies?.[0]) {
+    const hasResults = (movies?.length ?? 0) > 0;
+    if (hasResults && movies?.[0] && searchQuery.trim()) {
       updateSearchCount(searchQuery, movies[0]);
     }
-  }, [movies]);
+  }, [movies, searchQuery]);
   return (
     <View className="flex-1 bg-primary">
       <Image
@@ -50,9 +56,9 @@ const Search = () => {
 
       <FlatList
         className="px-5"
-        data={movies as Movie[]}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <MovieCard {...item} />}
+        data={movies}
+        keyExtractor={movieKeyExtractor}
+        renderItem={renderMovieItem}
         numColumns={3}
         columnWrapperStyle={{
           justifyContent: "flex-start",
@@ -91,7 +97,7 @@ const Search = () => {
             {!loading &&
               !error &&
               searchQuery.trim() &&
-              movies?.length! > 0 && (
+              (movies?.length ?? 0) > 0 && (
                 <Text className="text-xl text-white font-bold">
                   Search Results for{" "}
                   <Text className="text-accent">{searchQuery}</Text>

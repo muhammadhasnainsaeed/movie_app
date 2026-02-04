@@ -1,24 +1,25 @@
 import { Link } from "expo-router";
+import { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import { icons } from "@/constants/icons";
 
-const MovieCard = ({
+const MovieCard = memo(function MovieCard({
   id,
   poster_path,
   title,
   vote_average,
   release_date,
-}: Movie) => {
+}: Movie) {
+  const uri = poster_path
+    ? `https://image.tmdb.org/t/p/w500${poster_path}`
+    : "https://placehold.co/600x400/1a1a1a/FFFFFF.png";
+
   return (
     <Link href={`/movie/${id}`} asChild>
       <TouchableOpacity className="w-[30%]">
         <Image
-          source={{
-            uri: poster_path
-              ? `https://image.tmdb.org/t/p/w500${poster_path}`
-              : "https://placehold.co/600x400/1a1a1a/FFFFFF.png",
-          }}
+          source={{ uri }}
           className="w-full h-52 rounded-lg"
           resizeMode="cover"
         />
@@ -45,6 +46,6 @@ const MovieCard = ({
       </TouchableOpacity>
     </Link>
   );
-};
+});
 
 export default MovieCard;

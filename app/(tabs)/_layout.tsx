@@ -1,15 +1,16 @@
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { Tabs } from "expo-router";
+import { memo } from "react";
 import { Image, ImageBackground, Text, View } from "react-native";
 
 interface TabIconProps {
   focused: boolean;
-  icon: any;
+  icon: import("react-native").ImageSourcePropType;
   title: string;
 }
 
-const TabIcon = ({ focused, icon, title }: TabIconProps) => {
+const TabIcon = memo(function TabIcon({ focused, icon, title }: TabIconProps) {
   if (!focused) {
     return (
       <View className="size-full mt-4 items-center justify-center flex-row">
@@ -28,7 +29,8 @@ const TabIcon = ({ focused, icon, title }: TabIconProps) => {
       </Text>
     </ImageBackground>
   );
-};
+});
+
 export default function TabLayout() {
   return (
     <Tabs

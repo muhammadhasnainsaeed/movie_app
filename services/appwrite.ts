@@ -1,9 +1,25 @@
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 import { Client, Databases, ID, Query } from "react-native-appwrite";
 import "react-native-url-polyfill/auto";
 
+// Platform ID must match what's registered in Appwrite Console → Project → Platforms
+const getPlatformId = () => {
+  const config = Constants.expoConfig;
+  return Platform.OS === "android"
+    ? config?.android?.package ?? "host.exp.Exponent"
+    : Platform.OS === "ios"
+      ? config?.ios?.bundleIdentifier ?? "host.exp.Exponent"
+      : "host.exp.Exponent";
+};
+
+const projectId = process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!;
+const endpoint = "https://fra.cloud.appwrite.io/v1";
+
 const appwriteClient = new Client()
-  .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!)
-  .setEndpoint("https://fra.cloud.appwrite.io/v1");
+  .setProject(projectId)
+  .setEndpoint(endpoint)
+  .setPlatform(getPlatformId());
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
 const COLLECTION_ID = process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID!;

@@ -1,12 +1,13 @@
 import { images } from "@/constants/images";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { Link } from "expo-router";
+import { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const TrendingCard = ({
+const TrendingCard = memo(function TrendingCard({
   movie: { movie_id, title, poster_url },
   index,
-}: TrendingCardProps) => {
+}: TrendingCardProps) {
   return (
     <Link href={`/movie/${movie_id}`} asChild>
       <TouchableOpacity className="w-32 relative pl-5">
@@ -39,6 +40,6 @@ const TrendingCard = ({
       </TouchableOpacity>
     </Link>
   );
-};
+});
 
 export default TrendingCard;
